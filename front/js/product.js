@@ -44,65 +44,87 @@ fetch(`http://localhost:3000/api/products/${id}`)
 function displaySoloArticles(value) {
   // for (let i = 0; i < value.length; i++) {
   //   if (id === value[i]._id) {
-      const item_img = document.querySelector(".item__img");
-      const img = document.createElement("img");
-      img.src = value.imageUrl;
-      img.alt = value.altText;
+  const item_img = document.querySelector(".item__img");
+  const img = document.createElement("img");
+  img.src = value.imageUrl;
+  img.alt = value.altText;
 
-      const title = document.getElementById("title");
-      title.textContent = value.name;
+  const title = document.getElementById("title");
+  title.textContent = value.name;
 
-      const price = document.getElementById("price");
-      price.textContent = value.price;
+  const price = document.getElementById("price");
+  price.textContent = value.price;
 
-      const description = document.getElementById("description");
-      description.textContent = value.description;
+  const description = document.getElementById("description");
+  description.textContent = value.description;
 
-      console.log(value.colors.length + "  = value[i].colors.length");
-      console.log(value.colors + "   = value[i].colors");
+  console.log(value.colors.length + "  = value[i].colors.length");
+  console.log(value.colors + "   = value[i].colors");
 
-      for (let c = 0; c < value.colors.length; c++) {
-        const colors = document.getElementById("colors");
-        
-        const option = document.createElement("option");
-        colors.append(option);
-        option.value = value.colors[c];
-        option.text = value.colors[c];
-        console.log(value.colors[c] + "   = value[i].colors[c]");
-      }
+  for (let c = 0; c < value.colors.length; c++) {
+    const colors = document.getElementById("colors");
 
-      item_img.append(img);
-    }
-  //}
-//}
+    const option = document.createElement("option");
+    colors.append(option);
+    option.value = value.colors[c];
+    option.text = value.colors[c];
+    console.log(value.colors[c] + "   = value[i].colors[c]");
+  }
+
+  item_img.append(img);
+}
 //...............local Storage ........................//
-//====================CREATION DU PANIER=======
 
-addToCart.addEventListener("click", () => {
+//====================CREATION DU PANIER au Click =======
+
+addToCart.addEventListener("click", (e) => {
   const choixProduit = {
     id: searchParams.get("id"),
     colors: document.getElementById("colors").value,
     quantity: parseInt(document.getElementById("quantity").value),
   };
-  addProduct(choixProduit);
+  if (document.getElementById("addToCart").textContent === "Ajouter au panier") {
+    addProduct(choixProduit);
+  } else if (document.getElementById("addToCart").textContent === "Produit Ajouté !") { 
+    document.getElementById("addToCart").removeEventListener('click',(e))
+  }
+});
+//... actualisation du bouton Ajouter au changement de couleur ou quantité...
+
+document.getElementById("quantity").addEventListener("change", () => {
+  document.getElementById("addToCart").textContent = "Ajouter au panier";
+  document.getElementById("addToCart").style.background = "#2C3E50";
+});
+document.getElementById("colors").addEventListener("change", () => {
+  document.getElementById("addToCart").textContent = "Ajouter au panier";
+  document.getElementById("addToCart").style.background = "#2C3E50";
+});
+document.getElementById("addToCart").addEventListener("mouseover", () => {
+  (document.getElementById("addToCart").textContent = "Ajouter au panier"),
+    (document.getElementById("addToCart").style.background = "#2C3E50");
 });
 
 //===============   FONCTION =========================
 
 function addProduct(article) {
-  const isValidArticle = article.quantity > 0   && article.colors != "";
+  const isValidArticle = article.quantity > 0 && article.colors != "";
   if (!isValidArticle) return;
 
   let basket = JSON.parse(localStorage.getItem("basket")) || [];
-  const index = basket.findIndex(             // on boucle le panier par index ayant id 
+  const index = basket.findIndex(
+    // on boucle le panier par index ayant id
     (product) => article.id == product.id && article.colors == product.colors
   );
-  if (basket.length == 0 || index == -1) { // .find retourne -1 si aucun index n'est trouvé
+  if (basket.length == 0 || index == -1) {
+    // .find retourne -1 si aucun index n'est trouvé
     basket.push(article);
   } else if (index != -1) {
     basket[index].quantity += article.quantity;
   }
   localStorage.setItem("basket", JSON.stringify(basket));
+  document.getElementById("addToCart").textContent = "Produit Ajouté !";
+  document.getElementById("addToCart").style.backgroundColor = "green";
+  document.getElementById("addToCart").style.borderColor = "white";
 }
 
 //================ ==========================
