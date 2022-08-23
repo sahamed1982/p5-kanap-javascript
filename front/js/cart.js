@@ -1,22 +1,19 @@
 //==========================================================
-// Declaration de la variable pour appeler le local storage
+// Declaration de la constante pour appeler le local storage
 //==========================================================
 
 const clientBasket = localStorage.getItem("basket");
-console.log(clientBasket);
 
 const clientBasketJson = JSON.parse(clientBasket);
-console.log(clientBasketJson);
 
-let total = 0; // variable  total du prix
-let totalQte = 0; // variable de la quantite total
+let total = 0; // variable  total du prix . on l'initialise a 0.
+let totalQte = 0; // variable de la quantite total..
 
 //==========================================================
 //On fait une boucle dans le local storage
 //=========================================================
 
 for (let i = 0; i < clientBasketJson.length; i++) {
-  console.log(clientBasketJson[i]);
   let id = clientBasketJson[i].id;
   let color = clientBasketJson[i].colors;
 
@@ -125,7 +122,6 @@ for (let i = 0; i < clientBasketJson.length; i++) {
 }
 document.getElementById("totalQuantity").textContent = calculateTotalQuantity(); //rappel la function calcul qui return la quantity
 calculateTotalPrice().then((total) => {
-  console.log(total);
   document.getElementById("totalPrice").textContent = total;
 });
 //==================================================================================================
@@ -137,16 +133,20 @@ function deleteProduct(id, color) {
   const index = clientBasketJson.findIndex(
     (product) => product.id === id && product.colors === color
   );
-  console.log(index);
+  
   // on supprime la ligne où il y a l'index
   clientBasketJson.splice(index, 1);
-  console.log(clientBasketJson);
+  
   // on reinsere les nouvelles donnees dans le local storage
   localStorage.setItem("basket", JSON.stringify(clientBasketJson));
   // ... pour refresh de la page
   location.reload();
 }
-//
+
+// let article = document.querySelector(`article[data-id="${id}"][data-color="${color}"]`);
+// article.remove(); // ou supprimer la div qui evite de rafraichir la page
+
+//__________________________________________________________________________________________________
 // .....................fonction qui CALCUL le total et la quantite du panier -------------------
 //___________________________________________________________________________________________________
 
@@ -184,7 +184,6 @@ async function calculateTotalPrice() {
         const product = await res.json();
 
         totalPrice += product.price * Number(basketProduct.quantity);
-        console.log(totalPrice);
         return totalPrice;
       })
     );
@@ -193,14 +192,6 @@ async function calculateTotalPrice() {
   return totalPrice;
 }
 
-// let article = document.querySelector(`article[data-id="${id}"][data-color="${color}"]`);
-// article.remove(); // ou supprimer la div qui evite de rafraichir la page
-
-// ----------------changeQte  -- CHANGER LA QUANTITE D'UN PRODUIT DU PANIER--------------------
-
-// function changeQty(id, color, quantite) {
-//   let input;
-// }
 
 //===========================================================
 //          CHANGER LA QUANTITE A PARTIR DU PANIER
@@ -218,7 +209,6 @@ function changeQty(id, color, quantity, clientBasketJson) {
   document.getElementById("totalQuantity").textContent =
     calculateTotalQuantity(); //rappel la function calcul qui return la quantity
   calculateTotalPrice().then((total) => {
-    console.log(total);
     document.getElementById("totalPrice").textContent = total;
   });
 }
@@ -238,11 +228,11 @@ const regexEmail = /^[\w-\.]+@{1}([\w-]+\.)+[\w-]{2,4}$/
 //.........................................................................
 //....firstname 
  form.firstName.addEventListener("change",function () {
-      verifOnChange(regexFirstName,form.firstName,"Le prénom ne peut pas contenir de chiffres! Et entre  2 et 20 caratères")
+      verifOnChange(regexFirstName,this,"Le prénom ne peut pas contenir de chiffres ! Et dois être compris entre 2 et 20 caratères")
 });
 //....Lastname 
 form.lastName.addEventListener("change",function () {
-  verifOnChange(regexLastName,this,"Le nom ne peut pas contenir de chiffres! Et entre  2 et 20 caratères")
+  verifOnChange(regexLastName,this,"Le nom ne peut pas contenir de chiffres ! Et dois être compris entre 2 et 20 caratères")
 });
 //....address
 form.address.addEventListener("change",function () {
@@ -261,16 +251,16 @@ form.email.addEventListener("change",function () {
 //=================================================================
 function verifOnChange (regex,input, msg) {
   let test = regex.test(input.value);
-  console.log(test);
   if (test == true) {
-    input.nextElementSibling.textContent = " ";
+    let ErrorMsg = input.nextElementSibling;
+    ErrorMsg.textContent = "";
     isValid = true;
   } else {
-    input.nextElementSibling.textContent = msg;
+    let ErrorMsg = input.nextElementSibling;
+    ErrorMsg.textContent = msg;
     isValid = false;
   };
   };
-
 //=================================================================
 //                          POST
 //=================================================================
@@ -278,6 +268,12 @@ function verifOnChange (regex,input, msg) {
 
   btnOrder.addEventListener("click", (e) => {
   e.preventDefault();
+  const firstName = document.getElementById("firstName");
+  const lastName = document.getElementById("lastName");
+  const address = document.getElementById("address");
+  const city = document.getElementById("city");
+  const email = document.getElementById("email");
+  
   const contact = {
     firstName: document.getElementById("firstName").value,
     lastName: document.getElementById("lastName").value,
@@ -287,8 +283,7 @@ function verifOnChange (regex,input, msg) {
   };
 
   const basket = JSON.parse(localStorage.getItem("basket"));
-  const products = basket.map((product) => product.id);
-  console.log(products);
+  const products = basket.map((product) => product.id); //.map  crée un tableau avec tous les id
 
   const objet = {
     contact,
@@ -298,12 +293,13 @@ function verifOnChange (regex,input, msg) {
   //                      VERIFICATION BEFORE SUBMIT
   //=================================================================
   //--------------------verification si le formulaire est valide------
+  
   isValid = true;
-  verifOnChange(regexFirstName,this,"Le prénom ne peut pas contenir de chiffres! Et entre  2 et 20 caratères");
-  verifOnChange(regexLastName,this,"Le nom ne peut pas contenir de chiffres! Et entre  2 et 20 caratères");
-  verifOnChange(regexAddress,this,"L'adresse doit contenir des lettres sans ponctuation et des chiffres !");
-  verifOnChange(regexCity,this,"La ville doit contenir minimum 2 lettres sans chiffre");
-  verifOnChange(regexEmail,this,"L'adresse email n'est pas valide !");
+  verifOnChange(regexFirstName,firstName,"Le prénom ne peut pas contenir de chiffres ! Et dois être compris entre 2 et 20 caratères");
+  verifOnChange(regexLastName,lastName,"Le nom ne peut pas contenir de chiffres ! Et dois être compris entre 2 et 20 caratères");
+  verifOnChange(regexAddress,address,"L'adresse doit contenir des lettres sans ponctuation et des chiffres !");
+  verifOnChange(regexCity,city,"La ville doit contenir minimum 2 lettres sans chiffre");
+  verifOnChange(regexEmail,email,"L'adresse email n'est pas valide !");
   if(isValid ) {
 
     send(objet).then((result) =>(document.location.href = `confirmation.html?orderId=${result.orderId}`));//redirection de la page

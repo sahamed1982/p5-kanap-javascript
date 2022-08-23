@@ -6,7 +6,7 @@
  
 fetch('http://localhost:3000/api/products/')
 .then(function(res) {
-  console.log(res);
+ // console.log(res);
   if (res.ok)
     return res.json();  //.si la promesse est ok => retourne le resultat de la promesse en JSON
   }
@@ -17,8 +17,8 @@ fetch('http://localhost:3000/api/products/')
 
 })
 .catch(function(err) {
-  document.querySelector("title").innerHTML = "404 ERROR";
-  console.log(" ERROR 404 :" + err);
+  document.querySelector("title").textContent = "404 ERROR";
+  //console.log(" ERROR 404 :" + err);
 
 });
 
@@ -57,19 +57,3 @@ function displayArticles (value) {
 
   }
 };
-
-
-
- 
-
-
-
-// fetch('http://localhost:3000/api/products')
-//     .then((res) => res.json())
-//     .then(productData => {
-//          console.log(productData[]);
-//     })
-
-//     .catch(function(error) {
-
-//     });
